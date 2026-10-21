@@ -1,0 +1,66 @@
+FICHA DEL PROYECTO POO
+
+Grupo: Nicole Julay Ramirez Silva y Santiago Muñoz Eslava
+Proyecto: Merakié
+Descripción: 
+Plataforma que conectará clientes con salones de belleza, centros de estética y profesionales independientes que ofrecen servicios de belleza y cuidado personal. La plataforma permitirá a los usuarios buscar servicios, encontrar establecimientos cercanos, consultar precios y disponibilidad, reservar citas, cancelar o reagendar servicios y recibir notificaciones sobre espacios disponibles.
+Además, contaremos con servicios a domicilio, una tienda virtual de productos de belleza y cuidado personal y en la plataforma habrá un espacio en el cual hay descuentos. Adicionalmente contaremos con un sistema de membresía denominado Merakié Pass, que ofrecerá beneficios y descuentos a sus suscriptores. El proyecto estará basado en la filosofía Kaizen, enfocada en la mejora continua de la experiencia de los usuarios, los profesionales y la propia plataforma.
+
+1. AGENTES Y SUS ACTIVIDADES
+- Cliente: Es la persona que utiliza la plataforma para buscar servicios de belleza, comparar precios, reservar, cancelar o reprogramar citas, comprar productos y calificar los servicios recibidos.
+- Establecimiento y profesional independiente: Son quienes ofrecen servicios de belleza, como peluquería, manicure, maquillaje y depilación láser. Sus actividades son registrar sus perfiles, publicar servicios, establecer precios y horarios, gestionar reservas y atender a los clientes, ya sea en sus establecimientos o a domicilio.
+- Proveedor y aliado comercial: Son las personas o empresas que suministran productos e insumos de belleza o establecen convenios con Merakié. Sus actividades son ofrecer productos, actualizar precios y existencias, gestionar pedidos y proporcionar promociones y beneficios para los usuarios.
+- Administrador: Es el encargado de supervisar el funcionamiento de la plataforma. Sus actividades son gestionar usuarios, revisar la información de los negocios y profesionales, supervisar las reservas, administrar comisiones y suscripciones, y atender reportes o inconvenientes.
+
+2. CLASES Y SUS MÉTODOS
+- Cliente: * Registrarse()
+* IniciarSesion()
+* BuscarServicio()
+* ReservarCita()
+* ComprarProducto()
+* CalificarServicio()
+- Proveedor: * PublicarProductos()
+* VenderAlPorMayor()
+* OfrecerMejoresPrecios()
+* ActualizarDisponibilidad()
+* GestionarPedidos()
+- TrabajadorIndependiente: * RegistrarPerfil()
+* PublicarServicios()
+* OfrecerServicioADomicilio()
+* GestionarDisponibilidad()
+* RespetarHorarios()
+* ObtenerCalificaciones()
+* ConseguirClientes()
+- ServicioBelleza: * RegistrarNegocio()
+* PublicarServicios()
+* EstablecerPrecios()
+* GestionarHorarios()
+* GestionarReservas()
+* AtenderClientes()
+- Administrador: * GestionarUsuarios()
+* VerificarPerfiles()
+* SupervisarReservas()
+* GestionarProductos()
+* AdministrarComisiones()
+* AtenderReportes()
+
+3. CLASE ANALIZADA: Cliente
+Atributos:  nombre: String
+ documento: String
+ edad: int
+ correo: String
+ telefono: String
+ contraseña: String
+Validación (setter): La edad debe ser mayor o igual a 18 y menor o igual a 100; si no, se rechaza el valor.
+
+4. HERENCIA
+Usuario → Cliente, Administrador, TrabajadorIndependiente.
+Justificación (ES UN): * Cliente ES UN usuario de la plataforma Merakié.
+* Administrador ES UN usuario de la plataforma Merakié.
+* TrabajadorIndependiente ES UN usuario de la plataforma Merakié.
+
+5. RELACIONES QUE NO SON HERENCIA (TIENE UN)
+* Cliente TIENE UN ServicioBelleza que desea reservar.
+* TrabajadorIndependiente TIENE UN ServicioBelleza que ofrece.
+* Administrador TIENE UN acceso a la gestión de la plataforma.
+* Proveedor TIENE UN catálogo de productos que comercializa.
