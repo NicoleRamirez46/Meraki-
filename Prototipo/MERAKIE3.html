@@ -1,0 +1,139 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merakié | Belleza y cuidado personal</title>
+<style>
+:root{--plum:#6e543f;--pink:#eabf96;--rose:#e8e7a5;--ink:#2b2530;--muted:#3a2b21;--white:#fff;--line:#eadde5;--green:#2d7a55}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);background:#fffafc}
+header{background:linear-gradient(120deg,#f8e8f0,#fff);padding:22px clamp(16px,5vw,64px);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.logo{font-family:Georgia,serif;font-size:30px;color:var(--plum);font-weight:bold}.logo small{display:block;font:11px system-ui;letter-spacing:3px;text-transform:uppercase}
+nav{display:flex;gap:8px;flex-wrap:wrap}button,.navbtn{border:0;border-radius:999px;padding:10px 15px;cursor:pointer;font:inherit;background:#f1e3eb;color:var(--plum);font-weight:600}button:hover,.navbtn:hover{filter:brightness(.96)}button.primary{background:var(--plum);color:white}button.danger{background:#fbe3e4;color:#9d3038}button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1150px;margin:auto;padding:28px 18px 70px}.hero{padding:34px;border-radius:24px;background:linear-gradient(130deg,#be9778,#b77c9b);color:white;margin-bottom:24px}.hero h1{font:clamp(30px,5vw,48px) Georgia;margin:0 0 12px}.hero p{max-width:680px;line-height:1.6}.section{display:none}.section.active{display:block}.section h2{color:var(--plum);font:30px Georgia;margin:12px 0}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 4px 15px #653b5c0b}.card h3{margin:8px 0;color:var(--plum)}.price{font-weight:800;color:var(--plum);font-size:18px}.tag{display:inline-block;background:#f8edf2;color:#895b78;border-radius:8px;padding:4px 8px;font-size:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.form{display:grid;gap:12px;max-width:560px}.form label{display:grid;gap:5px;font-weight:600}.form input,.form select,.form textarea{padding:11px;border:1px solid #d9cbd4;border-radius:10px;font:inherit;background:white;width:100%}.notice{padding:12px 14px;border-radius:12px;background:#f1f8f3;color:#246844;margin:12px 0}.warning{background:#fff4df;color:#80561a}.empty{padding:24px;text-align:center;background:white;border:1px dashed #d9cbd4;border-radius:16px}.item{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.small{font-size:13px}.footer{border-top:1px solid var(--line);padding:24px;text-align:center;color:var(--muted)}.pill{background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:99px;font-size:13px}
+@media(max-width:600px){header{padding:16px}.hero{padding:23px}nav button{padding:8px 11px;font-size:13px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Merakié <small>belleza · bienestar · tú</small></div>
+  <nav id="nav">
+    <button onclick="showSection('home')">Inicio</button>
+    <button onclick="showSection('salons')">Salones y citas</button>
+    <button onclick="showSection('shop')">Tienda</button>
+    <button onclick="showSection('deals')">Descuentos</button>
+    <button onclick="showSection('pass')">Merakié Pass</button>
+    <button onclick="showSection('calendar')">Mi calendario</button>
+    <button onclick="showSection('account')" id="accountNav">Ingresar / registrarme</button>
+    <button onclick="showSection('cart')">Carrito <span id="cartCount">0</span></button>
+  </nav>
+</header>
+<main>
+<section id="home" class="section active">
+  <div class="hero"><span class="tag">Tu belleza, a tu manera</span><h1>Un espacio para cuidarte.</h1><p>Descubre salones, agenda servicios, compra productos de cuidado personal y encuentra promociones. Todo en un solo lugar.</p><button class="primary" onclick="showSection('salons')">Encuentra tu próxima cita</button> <button onclick="showSection('shop')">Explorar tienda</button></div>
+  <div class="grid">
+    <div class="card"><h3>✂️ Servicios de belleza</h3><p class="muted">Peluquería, uñas, maquillaje y más.</p><button onclick="showSection('salons')">Ver salones</button></div>
+    <div class="card"><h3>🧴 Tienda virtual</h3><p class="muted">Productos ficticios para tu rutina.</p><button onclick="showSection('shop')">Comprar productos</button></div>
+    <div class="card"><h3>🏷️ Promociones</h3><p class="muted">Ofertas de demostración.</p><button onclick="showSection('deals')">Ver descuentos</button></div>
+  </div>
+</section>
+
+<section id="salons" class="section">
+<h2>Salones y reserva de citas</h2><p class="muted">Selecciona un salón, servicio, fecha y hora disponible. Las reservas se guardan en este navegador y se muestran en “Mi calendario”.</p>
+<div class="grid" id="salonGrid"></div>
+<div class="card" style="margin-top:20px"><h3>Reservar una cita</h3><form class="form" id="bookingForm">
+<label>Salón<select id="salonSelect" required></select></label>
+<label>Servicio<select id="serviceSelect" required></select></label>
+<label>Fecha<input id="bookingDate" type="date" required></label>
+<label>Hora disponible<select id="timeSelect" required></select></label>
+<label>Modalidad<select id="modality"><option>En el salón</option><option>A domicilio (simulación)</option></select></label>
+<button class="primary">Confirmar reserva</button>
+<div id="bookingMsg" aria-live="polite"></div>
+</form></div>
+</section>
+
+<section id="shop" class="section"><h2>Tienda Merakié</h2><p class="muted">Catálogo de productos inventados. Añade lo que quieras al carrito.</p><div class="grid" id="productGrid"></div></section>
+<section id="deals" class="section"><h2>Descuentos</h2><p>Promociones de ejemplo, no válidas fuera de esta demostración.</p><div class="grid" id="dealGrid"></div></section>
+<section id="pass" class="section"><h2>Merakié Pass</h2><div class="card"><span class="tag">Membresía de demostración</span><h3>Beneficios para tu rutina</h3><p>Accede a descuentos simulados en productos y servicios. No se realiza ningún cobro real.</p><p class="price">$19.900 COP / mes (precio ficticio)</p><button class="primary" onclick="activatePass()">Activar Pass de prueba</button><p id="passMsg" aria-live="polite"></p></div></section>
+
+<section id="calendar" class="section"><div class="row"><div><h2>Mi calendario</h2><p class="muted">Tus citas reservadas en este navegador.</p></div><button onclick="exportCalendar()">Descargar calendario (.ics)</button></div><div id="appointments"></div></section>
+<section id="cart" class="section"><h2>Tu carrito</h2><div id="cartItems"></div><div class="card" id="checkout" style="margin-top:16px"></div></section>
+
+<section id="account" class="section"><h2>Cuenta de cliente</h2><p class="muted">Demo educativa: registro e inicio de sesión locales. No uses contraseñas reales.</p>
+<div class="grid">
+<div class="card"><h3>Crear cuenta</h3><form id="registerForm" class="form">
+<label>Nombre<input id="regName" required maxlength="80"></label>
+<label>Correo<input id="regEmail" type="email" required></label>
+<label>Documento (opcional)<input id="regDoc"></label>
+<label>Edad (18–100)<input id="regAge" type="number" min="18" max="100" required></label>
+<label>Teléfono<input id="regPhone" type="tel"></label>
+<label>Usuario<input id="regUser" required minlength="3"></label>
+<label>Contraseña de prueba<input id="regPass" type="password" required minlength="6"></label>
+<button class="primary">Registrarme</button><div id="registerMsg" aria-live="polite"></div>
+</form></div>
+<div class="card"><h3>Iniciar sesión</h3><form id="loginForm" class="form">
+<label>Usuario<input id="loginUser" required></label><label>Contraseña<input id="loginPass" type="password" required></label><button class="primary">Ingresar</button><div id="loginMsg" aria-live="polite"></div>
+</form><div id="sessionBox"></div></div></div></section>
+</main>
+<div class="footer">Merakié · Prototipo académico de POO · Los pagos, usuarios y reservas son simulados.</div>
+
+<script>
+const salons=[
+{id:1,name:"Aura Studio",area:"Chapinero, Bogotá",rating:"4.8",services:[["Corte y peinado",45000],["Manicure semipermanente",55000],["Diseño de cejas",25000]]},
+{id:2,name:"Luna Belleza",area:"Teusaquillo, Bogotá",rating:"4.7",services:[["Maquillaje social",85000],["Pedicure spa",60000],["Tratamiento capilar",70000]]},
+{id:3,name:"Flor de Piel Estética",area:"Usaquén, Bogotá",rating:"4.9",services:[["Limpieza facial",75000],["Depilación de cejas",20000],["Masaje relajante",90000]]},
+{id:4,name:"Brillo & Co.",area:"Engativá, Bogotá",rating:"4.6",services:[["Coloración básica",120000],["Uñas acrílicas",80000],["Peinado para evento",65000]]}
+];
+const products=[
+{id:101,name:"Shampoo Brisa Hidratante",desc:"Shampoo suave para uso diario · 300 ml",price:32000,emoji:"🧴"},
+{id:102,name:"Sérum Glow de Rosas",desc:"Sérum facial ficticio · 30 ml",price:48000,emoji:"🌹"},
+{id:103,name:"Crema Manos Nube",desc:"Crema humectante · 75 ml",price:18000,emoji:"🫧"},
+{id:104,name:"Kit Esmaltes Merakié",desc:"Set de 3 tonos de temporada",price:39000,emoji:"💅"},
+{id:105,name:"Mascarilla Capilar Seda",desc:"Mascarilla nutritiva · 250 g",price:42000,emoji:"🪷"},
+{id:106,name:"Protector Solar Día",desc:"Protector solar ficticio · 50 ml",price:52000,emoji:"☀️"}
+];
+const discounts=[{title:"Manicure con 15% de descuento",text:"En Aura Studio · promoción de ejemplo"},{title:"10% en cuidado capilar",text:"En productos seleccionados de la tienda"},{title:"Beneficio Merakié Pass",text:"Descuento adicional ficticio del 5% en productos"}];
+let cart=JSON.parse(localStorage.getItem("merakie_cart")||"[]");
+let appointments=JSON.parse(localStorage.getItem("merakie_appointments")||"[]");
+let users=JSON.parse(localStorage.getItem("merakie_users")||"[]");
+let currentUser=localStorage.getItem("merakie_session")||"";
+let passUsers=JSON.parse(localStorage.getItem("merakie_pass")||"[]");
+const money=n=>n.toLocaleString("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0});
+function showSection(id){document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===id));if(id==="cart")renderCart();if(id==="calendar")renderAppointments();if(id==="account")renderSession();window.scrollTo({top:0,behavior:"smooth"})}
+function persist(){localStorage.setItem("merakie_cart",JSON.stringify(cart));localStorage.setItem("merakie_appointments",JSON.stringify(appointments));localStorage.setItem("merakie_users",JSON.stringify(users));localStorage.setItem("merakie_pass",JSON.stringify(passUsers));}
+function renderSalons(){salonGrid.innerHTML=salons.map(s=>`<article class="card"><span class="tag">⭐ ${s.rating}</span><h3>${s.name}</h3><p class="muted">📍 ${s.area}</p><p>${s.services.map(x=>x[0]).join(" · ")}</p><button onclick="chooseSalon(${s.id})">Agendar aquí</button></article>`).join("");salonSelect.innerHTML=salons.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");updateServices()}
+function chooseSalon(id){salonSelect.value=id;updateServices();showSection("salons");bookingForm.scrollIntoView({behavior:"smooth"})}
+function updateServices(){let s=salons.find(x=>x.id==salonSelect.value)||salons[0];serviceSelect.innerHTML=s.services.map((x,i)=>`<option value="${i}">${x[0]} — ${money(x[1])}</option>`).join("");updateTimes()}
+function updateTimes(){const date=bookingDate.value;const salonId=+salonSelect.value;const slots=["09:00","10:00","11:30","13:00","14:30","16:00"];let free=slots.filter(t=>!appointments.some(a=>a.salonId===salonId&&a.date===date&&a.time===t));timeSelect.innerHTML=free.length?free.map(t=>`<option>${t}</option>`).join(""):`<option value="">No hay horarios libres</option>`}
+salonSelect.addEventListener("change",updateServices);bookingDate.addEventListener("change",updateTimes);
+function renderProducts(){productGrid.innerHTML=products.map(p=>`<article class="card"><div style="font-size:38px">${p.emoji}</div><h3>${p.name}</h3><p class="muted">${p.desc}</p><p class="price">${money(p.price)}</p><button class="primary" onclick="addCart(${p.id})">Añadir al carrito</button></article>`).join("");dealGrid.innerHTML=discounts.map(d=>`<article class="card"><span class="tag">Oferta de muestra</span><h3>${d.title}</h3><p>${d.text}</p></article>`).join("")}
+function addCart(id){let p=products.find(x=>x.id===id),item=cart.find(x=>x.id===id);if(item)item.qty++;else cart.push({id:p.id,qty:1});persist();updateCartCount();alert(p.name+" se añadió al carrito.");}
+function updateCartCount(){cartCount.textContent=cart.reduce((n,x)=>n+x.qty,0)}
+function renderCart(){if(!cart.length){cartItems.innerHTML='<div class="empty">Tu carrito está vacío. ¡Explora la tienda!</div>';checkout.innerHTML='<p class="muted">Agrega productos para simular una compra.</p>';return}
+cartItems.innerHTML=cart.map(x=>{let p=products.find(y=>y.id===x.id);return `<div class="item"><div><b>${p.name}</b><div class="small muted">${money(p.price)} c/u</div><button onclick="changeQty(${p.id},-1)">−</button> <span class="pill">${x.qty}</span> <button onclick="changeQty(${p.id},1)">+</button></div><b>${money(p.price*x.qty)}</b></div>`}).join("");
+let total=cart.reduce((n,x)=>n+products.find(p=>p.id===x.id).price*x.qty,0);
+checkout.innerHTML=`<h3>Resumen</h3><div class="row"><span>Total de prueba</span><strong class="price">${money(total)}</strong></div><p class="small muted">No se realizará ningún cargo real ni se solicitarán datos bancarios.</p><button class="primary" onclick="simulatePayment()">Simular pago</button> <button class="danger" onclick="clearCart()">Vaciar carrito</button><div id="payMsg" aria-live="polite"></div>`}
+function changeQty(id,delta){let x=cart.find(a=>a.id===id);x.qty+=delta;if(x.qty<=0)cart=cart.filter(a=>a.id!==id);persist();updateCartCount();renderCart()}
+function clearCart(){cart=[];persist();updateCartCount();renderCart()}
+function simulatePayment(){if(!currentUser){payMsg.innerHTML='<p class="warning">Inicia sesión para completar la compra de demostración.</p>';return}let total=cart.reduce((n,x)=>n+products.find(p=>p.id===x.id).price*x.qty,0);payMsg.innerHTML=`<div class="notice">¡Pago simulado aprobado! Total: ${money(total)}. Pedido de demostración asociado a ${currentUser}. No se procesó dinero real.</div>`;cart=[];persist();updateCartCount();renderCart();checkout.insertAdjacentHTML("beforeend",'<div class="notice">Compra finalizada en modo demo.</div>')}
+bookingForm.addEventListener("submit",e=>{e.preventDefault();if(!currentUser){bookingMsg.innerHTML='<p class="warning">Debes iniciar sesión para reservar.</p>';return}let date=bookingDate.value;if(!date){bookingMsg.textContent="Selecciona una fecha.";return}let salon=salons.find(s=>s.id===+salonSelect.value),serv=salon.services[+serviceSelect.value],time=timeSelect.value;if(!time){bookingMsg.textContent="Ese día no hay horas libres.";return}appointments.push({id:Date.now(),user:currentUser,salonId:salon.id,salon:salon.name,service:serv[0],price:serv[1],date,time,modality:modality.value});persist();bookingMsg.innerHTML='<div class="notice">¡Cita reservada! Ya aparece en tu calendario.</div>';updateTimes();});
+function renderAppointments(){let own=appointments.filter(a=>a.user===currentUser).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));if(!currentUser){appointmentsDivMessage();return}appointments.innerHTML=own.length?own.map(a=>`<div class="card" style="margin:10px 0"><div class="row"><div><span class="tag">${a.date} · ${a.time}</span><h3>${a.service}</h3><p>${a.salon} · ${a.modality}</p><b>${money(a.price)}</b></div><button class="danger" onclick="cancelAppointment(${a.id})">Cancelar</button></div></div>`).join(""):'<div class="empty">Todavía no tienes citas reservadas.</div>'}
+function appointmentsDivMessage(){appointments.innerHTML='<div class="empty">Inicia sesión para consultar tu calendario personal.</div>'}
+function cancelAppointment(id){if(confirm("¿Cancelar esta cita?")){appointments=appointments.filter(a=>a.id!==id);persist();renderAppointments();updateTimes()}}
+function exportCalendar(){let own=appointments.filter(a=>a.user===currentUser);if(!own.length){alert("No tienes citas para exportar.");return}let ics="BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nPRODID:-//Merakie Demo//ES\\r\\n";own.forEach(a=>{let start=a.date.replaceAll("-","")+"T"+a.time.replace(":","")+"00";let end=a.date.replaceAll("-","")+"T"+String(+a.time.slice(0,2)+1).padStart(2,"0")+a.time.slice(3).replace(":","")+"00";ics+=`BEGIN:VEVENT\\r\\nUID:${a.id}@merakie.demo\\r\\nDTSTART:${start}\\r\\nDTEND:${end}\\r\\nSUMMARY:${a.service} - ${a.salon}\\r\\nEND:VEVENT\\r\\n`});ics+="END:VCALENDAR";let blob=new Blob([ics],{type:"text/calendar"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="mis-citas-merakie.ics";link.click();URL.revokeObjectURL(url)}
+registerForm.addEventListener("submit",e=>{e.preventDefault();let age=+regAge.value;if(age<18||age>100){registerMsg.innerHTML='<p class="warning">La edad debe estar entre 18 y 100 años.</p>';return}let uname=regUser.value.trim();if(users.some(u=>u.username.toLowerCase()===uname.toLowerCase())){registerMsg.innerHTML='<p class="warning">Ese usuario ya existe.</p>';return}users.push({name:regName.value,email:regEmail.value,document:regDoc.value,age,phone:regPhone.value,username:uname,password:regPass.value});persist();registerMsg.innerHTML='<div class="notice">Cuenta creada. Ahora puedes iniciar sesión.</div>';registerForm.reset()});
+loginForm.addEventListener("submit",e=>{e.preventDefault();let u=users.find(x=>x.username===loginUser.value.trim()&&x.password===loginPass.value);if(!u){loginMsg.innerHTML='<p class="warning">Usuario o contraseña incorrectos.</p>';return}currentUser=u.username;localStorage.setItem("merakie_session",currentUser);loginMsg.innerHTML=`<div class="notice">¡Hola, ${u.name}! Sesión iniciada.</div>`;renderSession();updateNavAccount()});
+function renderSession(){sessionBox.innerHTML=currentUser?`<div class="notice">Sesión activa: <b>${currentUser}</b><br><button class="danger" onclick="logout()">Cerrar sesión</button></div>`:"<p class='muted'>No has iniciado sesión.</p>"}
+function updateNavAccount(){accountNav.textContent=currentUser?"Mi cuenta: "+currentUser:"Ingresar / registrarme";renderSession()}
+function logout(){currentUser="";localStorage.removeItem("merakie_session");updateNavAccount();showSection("account")}
+function activatePass(){if(!currentUser){passMsg.textContent="Inicia sesión para activar la membresía demo.";return}if(!passUsers.includes(currentUser))passUsers.push(currentUser);persist();passMsg.textContent="Merakié Pass activado para esta cuenta (sin cobro)."}
+renderSalons();renderProducts();updateCartCount();updateNavAccount();
+const today=new Date();bookingDate.min=today.toISOString().slice(0,10);bookingDate.value=bookingDate.min;updateTimes();
+</script>
+</body>
+</html>'''
+path = Path("/mnt/data/merakie_demo.html")
+path.write_text(html, encoding="utf-8")
+print(f"Creado: {path} ({path.stat().st_size} bytes)")
